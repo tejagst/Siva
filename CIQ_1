@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import re
+import copy
 
 def cell_id(key_map):
     if re.search(r'CC\d', key_map):
@@ -78,9 +79,9 @@ final_list_df = []
 
 
 for i in df_comb_in['GNB_DU_ID'].unique():
-    col_map_loop = col_map
-    print(col_map_loop['GNODEB_AU ID'],"------", col_map['GNODEB_AU ID'] )
-    print(i,"----- Start")
+    col_map_loop = copy.deepcopy(col_map)
+    #print(col_map_loop['GNODEB_AU ID'],"------", col_map['GNODEB_AU ID'] )
+    #print(i,"----- Start")
     df_in = df_comb_in[df_comb_in['GNB_DU_ID']==i]
     for key,value in col_map_loop.items():
         if "CC" in key:
@@ -124,6 +125,10 @@ for i in df_comb_in['GNB_DU_ID'].unique():
                 #print(key, "------>", col_map_loop[key])
             except KeyError:
                 pass
-    print(col_map_loop['GNODEB_AU ID'])        
+    #print(col_map_loop['GNODEB_AU ID'])        
     final_list_df.append(col_map_loop)
-    print(i,"----- Stop")
+    #print(i,"----- Stop")
+df = pd.DataFrame(final_list_df, columns = list(col_map.keys()))
+df.to_csv("Test.csv", index =False)
+
+
