@@ -1,0 +1,129 @@
+import os
+import pandas as pd
+import re
+
+def cell_id(key_map):
+    if re.search(r'CC\d', key_map):
+        match = re.search(r'CC\d', key_map)
+        return int(re.search(r'\d', match.group()).group())
+
+    
+
+os.chdir(r"C:\Users\s.guggila\Desktop\CIQ Tool\Syracuse")
+##########      Defining Column Mapping     #########
+#os.chdir(r"C:\Users\s.guggila\Desktop\CIQ Tool\Syracuse")
+#df = pd.read_excel("Mapping.xlsx", usecols = [0,2])
+#df = df.fillna("")
+#col_map = dict(zip(df['CIQ Headers'], df['Combined Input']))
+
+col_map = {'Market': 'Default', 'MDC Name': 'Default', 'Hub / CRAN hub name': 'TBD',
+           '5G Cluster Name': 'TBD', 'VZW_Site_Name': 'GNB_DU_NAME', 'Sector': 'TBD',
+           'AU MIMO Configuration': 'TX + RX', 'AU Address (E911 Address)': 'DU_ADDRESS',
+           'AU Latitude': 'ANTENA_LATITUDE', 'AU Longitude': 'ANTENA_LONGITUDE', 'AU Site Type': 'Default',
+           'AU RadCenter Height (ft)': 'TBD', 'AU Antenna Azimuth': 'AZIMUTH',
+           'AU Mechanical Tilt (-ve is uptilt)': 'MECHANICAL_DOWNTILT', 'Sector': 'TBD', 'Site Type': 'CELL_TYPE',
+           'Network': 'Default', 'GNODEB_ID': 'ENODEB_ID', 'GNB_CU_Name': 'NAME',
+           'NE_ID_ACPF': 'ENODEB_ID', 'NE_ID_ACPF_Name': 'NE_ID_ACPF_NAME',
+           'NE_ID_AUPF': 'ENODEB_ID', 'NE_ID_AUPF_Name': 'NE_ID_AUPF_NAME',
+           'GNODEB_AU ID': 'GNB_DU_ID', 'GNB_AU_Name': 'GNB_DU_NAME', 'NE_ID_AU': 'GNB_DU_NUMBER',
+           'NR_PCI': 'PCI', 'PRACH_ROOT_SEQUENCE_INDEX': 'PRACH_CONFIG_INDEX',
+           'NR_FREQ_BAND': 'BAND_INFO', 'CC0_Cell_Identity': 'CELL_ID',
+           'CC0_Cell_Num': 'CARRIER_NUMBER', 'CC0_Cell_Name': 'ALIAS_NAME',
+           'CC0_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G', 'CC0_NR_Bandwidth': 'CHANNEL_WIDTH_5G',
+           'CC1_Cell_Identity': 'CELL_ID', 'CC1_Cell_Num': 'CARRIER_NUMBER',
+           'CC1_Cell_Name': 'ALIAS_NAME', 'CC1_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G',
+           'CC1_NR_Bandwidth': 'CHANNEL_WIDTH_5G', 'CC2_Cell_Identity': 'CELL_ID',
+           'CC2_Cell_Num': 'CARRIER_NUMBER', 'CC2_Cell_Name': 'ALIAS_NAME',
+           'CC2_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G', 'CC2_NR_Bandwidth': 'CHANNEL_WIDTH_5G',
+           'CC3_Cell_Identity': 'CELL_ID', 'CC3_Cell_Num': 'CARRIER_NUMBER',
+           'CC3_Cell_Name': 'ALIAS_NAME', 'CC3_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G',
+           'CC3_NR_Bandwidth': 'CHANNEL_WIDTH_5G', 'CC4_Cell_Identity': 'CELL_ID',
+           'CC4_Cell_Num': 'CARRIER_NUMBER', 'CC4_Cell_Name': 'ALIAS_NAME',
+           'CC4_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G', 'CC4_NR_Bandwidth': 'CHANNEL_WIDTH_5G',
+           'CC5_Cell_Identity': 'CELL_ID', 'CC5_Cell_Num': 'CARRIER_NUMBER', 'CC5_Cell_Name': 'ALIAS_NAME',
+           'CC5_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G', 'CC5_NR_Bandwidth': 'CHANNEL_WIDTH_5G',
+           'CC6_Cell_Identity': 'CELL_ID', 'CC6_Cell_Num': 'CARRIER_NUMBER', 'CC6_Cell_Name': 'ALIAS_NAME',
+           'CC6_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G', 'CC6_NR_Bandwidth': 'CHANNEL_WIDTH_5G',
+           'CC7_Cell_Identity': 'CELL_ID', 'CC7_Cell_Num': 'CARRIER_NUMBER', 'CC7_Cell_Name': 'ALIAS_NAME',
+           'CC7_NR_ARFCN': 'CENTER_CHANNEL_NUMBER_5G', 'CC7_NR_Bandwidth': 'CHANNEL_WIDTH_5G',
+           'Plug & Play': 'NO', 'OAM VLAN ID': 'ERIC_OAM_VLAN_ID', 'OAM Prefix Length': 'OAM_PREFIX_LENGTH',
+           'OAM IP': 'ERIC_OAM_IP_ADDRESS', 'OAM Gateway': 'NOKIA_TELECOM_IP', 'EMS IP': 'EMS_IP',
+           'RAN VLAN ID': 'RAN_VLAN_ID', 'RAN IP Address': 'ERIC_TELECOM_IP_ADDRESS_IPV6',
+           'RAN Gateway': 'ERIC_TELECOM_DEFAULT_ROUTER', 'RAN Prefix Length': 'RAN_PREFIX_LENGTH',
+           'RAN Route Prefix1': 'RAN_ROUTE_PREFIX1', 'RAN Route Prefix2': 'RAN_ROUTE_PREFIX2',
+           'Remote IP Address': 'REMOTE_IP_ADDRESS', '5G C&I Complete': 'TBD',
+           '# AU EN-DC Enabled (On-Air)': 'TBD', 'On-Air Date': 'TBD', 'ATP Completed': 'TBD',
+           'ATP Submitted to Verizon': 'TBD', 'ATP Approved by Verizon': 'TBD'
+           }
+
+###########       Defining Combined Input DataFrame       ###################
+combined_input_cols = ['GNB_DU_NAME','GNB_DU_ID', 'TX', 'RX', 'DU_ADDRESS',
+                       'ANTENA_LATITUDE', 'ANTENA_LONGITUDE', 'AZIMUTH', 'MECHANICAL_DOWNTILT',
+                       'CELL_TYPE', 'ENODEB_ID', 'NAME', 'NE_ID_ACPF_NAME', 'NE_ID_AUPF_NAME',
+                       'GNB_DU_NUMBER', 'PCI', 'PRACH_CONFIG_INDEX', 'BAND_INFO', 'CELL_ID',
+                       'CARRIER_NUMBER', 'ALIAS_NAME.1', 'CENTER_CHANNEL_NUMBER_5G', 'CHANNEL_WIDTH_5G',
+                       'ERIC_OAM_VLAN_ID', 'OAM_PREFIX_LENGTH', 'ERIC_OAM_IP_ADDRESS', 'NOKIA_TELECOM_IP',
+                       'EMS_IP', 'RAN_VLAN_ID', 'ERIC_TELECOM_IP_ADDRESS_IPV6', 'ERIC_TELECOM_DEFAULT_ROUTER',
+                       'RAN_PREFIX_LENGTH', 'RAN_ROUTE_PREFIX1', 'RAN_ROUTE_PREFIX2', 'REMOTE_IP_ADDRESS']
+
+df_comb_in = pd.read_excel("CIQ_Syracuse5G_Input_Combined_030320.xlsx", header= 1,
+                           usecols = combined_input_cols, dtype=str)
+
+for col in df_comb_in.columns:
+    if ".1" in col:
+        col_name = col.split(".")[0]
+        df_comb_in.rename(columns={col: col_name}, inplace=True)
+
+final_list_df = []
+
+
+for i in df_comb_in['GNB_DU_ID'].unique():
+    col_map_loop = col_map
+    print(col_map_loop['GNODEB_AU ID'],"------", col_map['GNODEB_AU ID'] )
+    print(i,"----- Start")
+    df_in = df_comb_in[df_comb_in['GNB_DU_ID']==i]
+    for key,value in col_map_loop.items():
+        if "CC" in key:
+            k = cell_id(key)
+            if "Cell_Num" in key:
+                try:
+                    col_map_loop[key] = str(int(df_in[value][k])-1)
+                except KeyError:
+                    pass
+            elif "Cell_Identity" in key:
+                try:
+                    col_map_loop[key] = "0"+df_in[value][k]
+                except KeyError:
+                    pass
+            else:
+                try:
+                    col_map_loop[key] = df_in[value][k]
+                except KeyError:
+                    pass
+                          
+            
+        elif key=='VZW_Site_Name':
+            try:
+                col_map_loop[key] = "_".join(df_in[value][0].split("_")[-3:])
+            except KeyError:
+                pass
+            
+   
+        elif key == 'AU MIMO Configuration':
+            try:
+                col_map_loop[key] = str(int(df_in['TX'][0]))+'T'+str(int(df_in['RX'][0]))+'R'
+            except:
+                pass
+            
+        #elif key=='VZW_Site_Name':
+            #col_map_loop[key] = "_".join(df_in[value][0].split("_")[-3:])
+
+        else:
+            try:
+                col_map_loop[key] = df_in[value][0]
+                #print(key, "------>", col_map_loop[key])
+            except KeyError:
+                pass
+    print(col_map_loop['GNODEB_AU ID'])        
+    final_list_df.append(col_map_loop)
+    print(i,"----- Stop")
